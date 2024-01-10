@@ -29,12 +29,14 @@ int main(void)
 
         glBegin(GL_POLYGON);
 
+        float ratio = 0.5f;
+
         //? https://mathworld.wolfram.com/RegularPentagon.html
-        glVertex2f(0.0f, 1.0f);
-        glVertex2f(sin((2 * M_PI) / 5), cos((2 * M_PI) / 5));
-        glVertex2f(sin((4 * M_PI) / 5), -cos((M_PI) / 5));
-        glVertex2f(-sin((4 * M_PI) / 5), -cos((M_PI) / 5));
-        glVertex2f(-sin((2 * M_PI) / 5), cos((2 * M_PI) / 5));
+        glVertex2f(0.0f, 1.0f * ratio);
+        glVertex2f(sin((2 * M_PI) / 5) * ratio, cos((2 * M_PI) / 5) * ratio);
+        glVertex2f(sin((4 * M_PI) / 5) * ratio, -cos((M_PI) / 5) * ratio);
+        glVertex2f(-sin((4 * M_PI) / 5) * ratio, -cos((M_PI) / 5) * ratio);
+        glVertex2f(-sin((2 * M_PI) / 5) * ratio, cos((2 * M_PI) / 5) * ratio);
         glEnd();
 
         /* Swap front and back buffers */
