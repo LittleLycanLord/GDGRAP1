@@ -11,7 +11,7 @@ int main(void)
         return -1;
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(480, 480, "Pentagon", NULL, NULL);
+    window = glfwCreateWindow(480, 480, "Conrad Amadeus Carmelo C. Ubay", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
