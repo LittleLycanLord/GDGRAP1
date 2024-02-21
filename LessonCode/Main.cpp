@@ -138,11 +138,6 @@ int main(void) {
     glGenBuffers(1, &VBO_UV);
     glGenBuffers(1, &EBO);
 
-    //? Convetional Vertex Attribute Indices:
-    //? 0: Vertices
-    //? 1: ???
-    //? 2: UV
-
     //* Open Vertex Array for Editing
     glBindVertexArray(VAO);
     //* Load in the Vertices
@@ -176,23 +171,7 @@ int main(void) {
 
     //* - - - - - END OF BUFFER SHAPES - - - - -
 
-    //* - - - - - PROJECTION - - - - -
-    //* Orthographic Projection
-    //* Bounds Setting
-    glm::mat4 projectionMatrix =
-        glm::perspective(glm::radians(FIELD_OF_VIEW),   //? FOV
-                         WINDOW_HEIGHT / WINDOW_WIDTH,  //? Aspect Ration
-                         0.1f,                          //? Z - Near
-                         100.f                          //? Z - Far
-        );
-    //* - - - - - END OF PROJECTION - - - - -
-
-    //* - - - - - CAMERA SETUP - - - - -
-
-
-    //* - - - - - END OF CAMERA SETUP - - - - -
-
-    ModelObject model = ModelObject(shader.getShaderProgram(), &projectionMatrix, camera.getViewMatrix(), &texture);
+    ModelObject model = ModelObject(shader.getShaderProgram(), camera.getViewMatrix(), &texture);
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window)) {

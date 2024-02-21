@@ -2,12 +2,14 @@
 
 using namespace models;
 
-ModelObject::ModelObject(GLuint* shaderProg, glm::mat4* projection_matrix, glm::mat4* view_matrix, GLuint* texture) {
+ModelObject::ModelObject(GLuint* shaderProg, glm::mat4* view_matrix, GLuint* texture) {
     this->modelMatrix = Matrix();
     this->shaderProg = *shaderProg;
-    this->projection_matrix = *projection_matrix;
+   
     this->view_matrix = *view_matrix;
     this->texture = *texture;
+
+    this->projection_matrix = glm::perspective(glm::radians(60.f), 600.f / 600.f,  0.1f, 100.f);
 }
 
 void ModelObject::updateModel(glm::mat4* view_matrix) {
