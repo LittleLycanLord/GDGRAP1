@@ -136,9 +136,12 @@
   <ItemGroup>
     <ClCompile Include="glad.c" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Model\Component\Matrix.cpp" />
     <ClCompile Include="Model\Component\Transformable.cpp" />
+    <ClCompile Include="Model\Entity\BaseObject\BaseObject.cpp" />
     <ClCompile Include="Model\Entity\Camera\Camera.cpp" />
     <ClCompile Include="Model\Entity\Model3D\Model3D.cpp" />
+    <ClCompile Include="Model\Entity\ModelObject\ModelObject.cpp" />
     <ClCompile Include="Model\Entity\Texture\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -424,9 +427,12 @@
     <ClInclude Include="Dependencies\include\glm\glm\vec3.hpp" />
     <ClInclude Include="Dependencies\include\glm\glm\vec4.hpp" />
     <ClInclude Include="Dependencies\include\glm\glm\vector_relational.hpp" />
+    <ClInclude Include="Model\Component\Matrix.hpp" />
     <ClInclude Include="Model\Component\Transformable.hpp" />
+    <ClInclude Include="Model\Entity\BaseObject\BaseObject.hpp" />
     <ClInclude Include="Model\Entity\Camera\Camera.hpp" />
     <ClInclude Include="Model\Entity\Model3D\Model3D.hpp" />
+    <ClInclude Include="Model\Entity\ModelObject\ModelObject.hpp" />
     <ClInclude Include="Model\Entity\Texture\Texture.hpp" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="tiny_obj_loader.h" />

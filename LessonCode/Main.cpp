@@ -1,9 +1,14 @@
 // TODO: glad.h has to be included before glfw3.h
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
+
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
+
+#include "Model/Entity/ModelObject/ModelObject.hpp"
+#include "Model/Entity/Camera/Camera.hpp"
+
 #include "iostream"
 #include "string"
 #include "vector"
@@ -13,6 +18,7 @@
 #include "stb_image.h"
 
 using namespace std;
+using namespace models;
 
 //* Window Attributes
 const float WINDOW_WIDTH  = 600.f;
@@ -41,9 +47,11 @@ glm::vec3 centerPosition  = glm::vec3(0.0, 3.f, 0.f);
 
 void Key_Callback(GLFWwindow* window, int key, int scancode, int action,
                   int mods) {
+    std::cout << "enters here" << std::endl;
     switch (key) {
         //* Moving:
         case GLFW_KEY_W:
+            std::cout << "pressed w key" << std::endl;
             // if (action == GLFW_PRESS) {
             // translate.y += movementSpeed;
             cameraPosition.z -= movementSpeed;
@@ -233,7 +241,7 @@ int main(void) {
 
     //* - - - - - BUFFER SHAPES - - - - -
     //* Load 3D Model
-    string path = "Model/AyayaCube.obj";
+    string path = "Model/Ayaya.obj";
     vector<tinyobj::shape_t> shapes;
     vector<tinyobj::material_t> material;
     string warning, error;
@@ -350,6 +358,8 @@ int main(void) {
 
     //* - - - - - END OF CAMERA SETUP - - - - -
 
+    ModelObject model = ModelObject(&shaderProgram, &projectionMatrix, &viewMatrix, &texture);
+
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window)) {
         //* - - - - - CAMERA - - - - -
@@ -358,59 +368,19 @@ int main(void) {
         viewMatrix = glm::lookAt(cameraPos, Center, WorldUp);
         //* - - - - - END OF CAMERA - - - - -
 
-        /* Render here */
-        //* Clear the window.
+        model.updateModel();
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        //* - - - - - MODEL MOVEMENT - - - - -
-        //* Get the Transformation matrix
-        glm::mat4 tranlateMatrix = glm::translate(glm::mat4(1.0f), translate);
-
-        glm::mat4 scaleMatrix    = glm::scale(glm::mat4(1.0f), scale);
-
-        glm::mat4 rotateMatrix =
-            glm::rotate(glm::mat4(1.0f), glm::radians(theta.x),
-                        glm::normalize(xRotationAxis)) *
-            glm::rotate(glm::mat4(1.0f), glm::radians(theta.y),
-                        glm::normalize(yRotationAxis)) *
-            glm::rotate(glm::mat4(1.0f), glm::radians(theta.z),
-                        glm::normalize(zRotationAxis));
-
-        //* Provide the shader's needed data
-        glm::mat4 transformationMatrix =
-            tranlateMatrix * scaleMatrix * rotateMatrix;
-
-        unsigned int projectionLoc =
-            glGetUniformLocation(shaderProgram, "projection");
-        glUniformMatrix4fv(projectionLoc, 1, GL_FALSE,
-                           glm::value_ptr(projectionMatrix));
-
-        unsigned int viewLoc = glGetUniformLocation(shaderProgram, "view");
-        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(viewMatrix));
-
-        unsigned int transformLoc =
-            glGetUniformLocation(shaderProgram, "transform");
-        glUniformMatrix4fv(transformLoc, 1, GL_FALSE,
-                           glm::value_ptr(transformationMatrix));
-
-        //* - - - - - END OF MODEL MOVEMENT - - - - -
-
-        //* - - - - - SHADER RENDERING - - - - -
+ 
+       
         //* Use the shader
         glUseProgram(shaderProgram);
-
         //* Load in the Vertex Array we made
         glBindVertexArray(VAO);
 
-        //* Use textures
-        GLuint tex0Address = glGetUniformLocation(shaderProgram, "tex0");
-        glBindTexture(GL_TEXTURE_2D, texture);
-        glUniform1i(tex0Address, 0);
-        glDrawElements(
-            GL_TRIANGLES, GLsizei(mesh_indices.size()), GL_UNSIGNED_INT,
-            0);  // the GLsizei() is just to remove
-                 // a warning, since glDrawElements has a parameter of it, and
-                 // it wants us to make sure we only plug GLsizei's in it.
+        model.drawModel(&mesh_indices);
+
+        glEnd();
 
         //* Swap front and back buffers
         glfwSwapBuffers(window);
