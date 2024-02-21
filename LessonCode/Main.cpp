@@ -233,7 +233,7 @@ int main(void) {
 
     //* - - - - - BUFFER SHAPES - - - - -
     //* Load 3D Model
-    string path = "Model/AyayaCube.obj";
+    string path = "Model/Ayaya.obj";
     vector<tinyobj::shape_t> shapes;
     vector<tinyobj::material_t> material;
     string warning, error;
