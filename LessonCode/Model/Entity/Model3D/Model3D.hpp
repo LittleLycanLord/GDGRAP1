@@ -1,5 +1,5 @@
 #pragma once
-#include "../../Component/Transformable.hpp"
+
 #include "../Texture/Texture.hpp"
 #include "GLFW/glfw3.h"
 #include "glad/glad.h"
@@ -13,8 +13,7 @@
 using namespace std;
 
 namespace models {
-using namespace components;
-class Model3D : public Transformable {
+class Model3D  {
     //* ╔════════════╗
     //* ║ Attributes ║
     //* ╚════════════╝

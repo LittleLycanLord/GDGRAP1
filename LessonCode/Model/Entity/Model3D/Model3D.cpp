@@ -6,23 +6,23 @@ using namespace models;
 //* ║ Constructors & Deconstructors ║
 //* ╚═══════════════════════════════╝
 Model3D::Model3D(string name, string modelPath)
-    : Transformable(),
+    : 
       modelName(name),
       modelPath(modelPath),
       texture(new Texture("NONE")) {}
 Model3D::Model3D(string name, string modelPath, glm::vec3 position)
-    : Transformable(position),
+    : 
       modelName(name),
       modelPath(modelPath),
       texture(new Texture("NONE")) {}
 Model3D::Model3D(string name, string modelPath, string texturePath)
-    : Transformable(),
+    : 
       modelName(name),
       modelPath(modelPath),
       texture(new Texture(texturePath)) {}
 Model3D::Model3D(string name, string modelPath, string texturePath,
                  glm::vec3 position)
-    : Transformable(position),
+    : 
       modelName(name),
       modelPath(modelPath),
       texture(new Texture(texturePath)) {}

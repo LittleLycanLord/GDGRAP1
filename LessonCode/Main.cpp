@@ -1,4 +1,9 @@
 // TODO: glad.h has to be included before glfw3.h
+
+#include "iostream"
+#include "string"
+#include "vector"
+
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
@@ -9,9 +14,6 @@
 #include "Model/Entity/ModelObject/ModelObject.hpp"
 #include "Model/Entity/Camera/Camera.hpp"
 
-#include "iostream"
-#include "string"
-#include "vector"
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
 #define STB_IMAGE_IMPLEMENTATION
@@ -25,128 +27,12 @@ const float WINDOW_WIDTH  = 600.f;
 const float WINDOW_HEIGHT = 600.f;
 float FIELD_OF_VIEW       = 60.f;
 
-//* Rates of Change
-float movementSpeed       = 0.1f;
-float rotateSpeed         = 10.f;
-float scalingRate         = 0.05f;
-float zoomRate            = 10.f;
 
-//* Translation Vector
-glm::vec3 translate       = glm::vec3(0.0f, 0.0f, 0.0f);
-//* Scale Vector
-glm::vec3 scale           = glm::vec3(1.0f, 1.0f, 1.0f);
-//* Rotation Axes
-glm::vec3 xRotationAxis   = glm::vec3(1.0f, 0.0f, 0.0f);
-glm::vec3 yRotationAxis   = glm::vec3(0.0f, 1.0f, 0.0f);
-glm::vec3 zRotationAxis   = glm::vec3(0.0f, 0.0f, 1.0f);
-//* Rotation Thetas
-glm::vec3 theta           = glm::vec3(0.0f, 0.0f, 0.0f);
-//* Camera Position
-glm::vec3 cameraPosition  = glm::vec3(0.0, 0, 10.f);
-glm::vec3 centerPosition  = glm::vec3(0.0, 3.f, 0.f);
+Camera camera = Camera();
 
 void Key_Callback(GLFWwindow* window, int key, int scancode, int action,
                   int mods) {
-    std::cout << "enters here" << std::endl;
-    switch (key) {
-        //* Moving:
-        case GLFW_KEY_W:
-            std::cout << "pressed w key" << std::endl;
-            // if (action == GLFW_PRESS) {
-            // translate.y += movementSpeed;
-            cameraPosition.z -= movementSpeed;
-            centerPosition.z -= movementSpeed;
-            // }
-            break;
-        case GLFW_KEY_A:
-            // translate.x -= movementSpeed;
-            cameraPosition.x -= movementSpeed;
-            centerPosition.x -= movementSpeed;
-            break;
-        case GLFW_KEY_S:
-            // translate.y -= movementSpeed;
-            cameraPosition.z += movementSpeed;
-            centerPosition.z += movementSpeed;
-            break;
-        case GLFW_KEY_D:
-            // translate.x += movementSpeed;
-            cameraPosition.x += movementSpeed;
-            centerPosition.x += movementSpeed;
-            break;
-        case GLFW_KEY_LEFT_SHIFT:
-            // translate.z -= movementSpeed;
-            cameraPosition.y += movementSpeed;
-            centerPosition.y += movementSpeed;
-            break;
-        case GLFW_KEY_LEFT_CONTROL:
-            // translate.z += movementSpeed;
-            cameraPosition.y -= movementSpeed;
-            centerPosition.y -= movementSpeed;
-            break;
-        //* Rotating:
-        case GLFW_KEY_UP:
-            theta.x -= rotateSpeed;
-            break;
-        case GLFW_KEY_DOWN:
-            theta.x += rotateSpeed;
-            break;
-        case GLFW_KEY_LEFT:
-            theta.y -= rotateSpeed;
-            break;
-        case GLFW_KEY_RIGHT:
-            theta.y += rotateSpeed;
-            break;
-        case GLFW_KEY_R:
-            theta.z -= rotateSpeed;
-            break;
-        case GLFW_KEY_T:
-            theta.z += rotateSpeed;
-            break;
-        //* Scaling:
-        case GLFW_KEY_Q:
-            scale.x -= scalingRate;
-            scale.y -= scalingRate;
-            scale.z -= scalingRate;
-            break;
-        case GLFW_KEY_E:
-            scale.x += scalingRate;
-            scale.y += scalingRate;
-            scale.z += scalingRate;
-            break;
-        //* Zooming:
-        case GLFW_KEY_Z:
-            FIELD_OF_VIEW -= zoomRate;
-            break;
-        case GLFW_KEY_X:
-            FIELD_OF_VIEW += zoomRate;
-            break;
-    }
-
-    //? Debug: What are the details of our model?
-    if (action == GLFW_PRESS) {
-        system("cls");
-        cout << "Tx"
-             << "\t"
-             << "Ty"
-             << "\t"
-             << "Tz"
-             << "\t"
-             << "thetaX"
-             << "\t"
-             << "thetaY"
-             << "\t"
-             << "thetaZ"
-             << "\t"
-             << "Sx"
-             << "\t"
-             << "Sy"
-             << "\t"
-             << "Sz"
-             << "\t" << endl;
-        cout << translate.x << "\t" << translate.y << "\t" << translate.z
-             << "\t" << theta.x << "\t" << theta.y << "\t" << theta.z << "\t"
-             << scale.x << "\t" << scale.y << "\t\t" << scale.z << "\t" << endl;
-    }
+    camera.updateCamera(key, &FIELD_OF_VIEW);
 }
 
 int main(void) {
@@ -324,53 +210,18 @@ int main(void) {
     //* - - - - - END OF PROJECTION - - - - -
 
     //* - - - - - CAMERA SETUP - - - - -
-    //* Initialize World Up & Camera Center
-    glm::vec3 WorldUp   = glm::vec3(0, 1.0f, 0);
-    glm::vec3 Center    = glm::vec3(0, 3.0f, 0);
-    //* Camera Position
-    glm::vec3 cameraPos = glm::vec3(0, 0, 10.f);
-    glm::mat4 cameraPositionMatrix =
-        glm::translate(glm::mat4(1.0f), cameraPos * -1.0f);
 
-    glm::vec3 forwardVector =
-        glm::normalize(glm::vec3(Center - cameraPos));  //* Set Forward Vector
-    glm::vec3 rightVector = glm::normalize(
-        glm::cross(forwardVector, WorldUp));  //* Set Right Vector
-    glm::vec3 upVector = glm::normalize(
-        glm::cross(rightVector, forwardVector));  //* Set Up Vector
-
-    //* Set Camera Orientation
-    glm::mat4 cameraOrientation = glm::mat4(1.f);
-    cameraOrientation[0][0]     = rightVector.x;
-    cameraOrientation[1][0]     = rightVector.y;
-    cameraOrientation[2][0]     = rightVector.z;
-    cameraOrientation[0][1]     = upVector.x;
-    cameraOrientation[1][1]     = upVector.y;
-    cameraOrientation[2][1]     = upVector.z;
-    cameraOrientation[0][2]     = -forwardVector.x;
-    cameraOrientation[1][2]     = -forwardVector.y;
-    cameraOrientation[2][2]     = -forwardVector.z;
-
-    //* Set View Matrix
-    glm::mat4 viewMatrix =
-        // cameraOrientation * cameraPositionMatrix;
-        glm::lookAt(cameraPos, Center, WorldUp);
 
     //* - - - - - END OF CAMERA SETUP - - - - -
 
-    ModelObject model = ModelObject(&shaderProgram, &projectionMatrix, &viewMatrix, &texture);
+    ModelObject model = ModelObject(&shaderProgram, &projectionMatrix, camera.getViewMatrix(), &texture);
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window)) {
-        //* - - - - - CAMERA - - - - -
-        cameraPos  = cameraPosition;
-        Center     = centerPosition;
-        viewMatrix = glm::lookAt(cameraPos, Center, WorldUp);
-        //* - - - - - END OF CAMERA - - - - -
-
+        
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
-        model.updateModel(&viewMatrix);
+        model.updateModel(camera.getViewMatrix());
        
         //* Use the shader
         glUseProgram(shaderProgram);
