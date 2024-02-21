@@ -46,8 +46,8 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action,
         case GLFW_KEY_W:
             // if (action == GLFW_PRESS) {
             // translate.y += movementSpeed;
-            cameraPosition.y += movementSpeed;
-            centerPosition.y += movementSpeed;
+            cameraPosition.z -= movementSpeed;
+            centerPosition.z -= movementSpeed;
             // }
             break;
         case GLFW_KEY_A:
@@ -57,8 +57,8 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action,
             break;
         case GLFW_KEY_S:
             // translate.y -= movementSpeed;
-            cameraPosition.y -= movementSpeed;
-            centerPosition.y -= movementSpeed;
+            cameraPosition.z += movementSpeed;
+            centerPosition.z += movementSpeed;
             break;
         case GLFW_KEY_D:
             // translate.x += movementSpeed;
@@ -67,13 +67,13 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action,
             break;
         case GLFW_KEY_LEFT_SHIFT:
             // translate.z -= movementSpeed;
-            cameraPosition.z -= movementSpeed;
-            centerPosition.z += movementSpeed;
+            cameraPosition.y += movementSpeed;
+            centerPosition.y += movementSpeed;
             break;
         case GLFW_KEY_LEFT_CONTROL:
             // translate.z += movementSpeed;
-            cameraPosition.z += movementSpeed;
-            centerPosition.z -= movementSpeed;
+            cameraPosition.y -= movementSpeed;
+            centerPosition.y -= movementSpeed;
             break;
         //* Rotating:
         case GLFW_KEY_UP:
