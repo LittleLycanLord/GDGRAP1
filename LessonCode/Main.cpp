@@ -14,13 +14,17 @@
 #include "Model/Entity/ModelObject/ModelObject.hpp"
 #include "Model/Entity/Camera/Camera.hpp"
 
+#include "Shaders/Shaders.hpp"
+
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
+
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
 using namespace std;
 using namespace models;
+using namespace shaders;
 
 //* Window Attributes
 const float WINDOW_WIDTH  = 600.f;
@@ -29,6 +33,7 @@ float FIELD_OF_VIEW       = 60.f;
 
 
 Camera camera = Camera();
+Shaders shader = Shaders();
 
 void Key_Callback(GLFWwindow* window, int key, int scancode, int action,
                   int mods) {
@@ -95,35 +100,8 @@ int main(void) {
     glfwSetKeyCallback(window, Key_Callback);
     //* - - - - - END OF BASIC INPUT - - - - -
 
-    //* - - - - - SHADERS - - - - -
-    //* Load the shader files
-    fstream vertSrc("Shaders/sample.vert");
-    fstream fragSrc("Shaders/sample.frag");
-    stringstream vertBuff;
-    stringstream fragBuff;
-    //* Add the file stream to the string stream
-    vertBuff << vertSrc.rdbuf();
-    fragBuff << fragSrc.rdbuf();
-    //* Convert the stream to a char array
-    string vertS          = vertBuff.str();
-    string fragS          = fragBuff.str();
-    const char* v         = vertS.c_str();
-    const char* f         = fragS.c_str();
-    GLuint vertexShader   = glCreateShader(GL_VERTEX_SHADER);
-    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(vertexShader, 1, &v, NULL);
-    glShaderSource(fragmentShader, 1, &f, NULL);
-    glCompileShader(vertexShader);
-    glCompileShader(fragmentShader);
-
-    //* Create a shader program, then attached the shaders
-    GLuint shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-
-    //* Link the shader program
-    glLinkProgram(shaderProgram);
-    //* - - - - - END OF SHADERS - - - - -
+    shader.initializeShaders();
+    shader.assignTexture(imageWidth, imageHeight, tex_bytes);
 
     //* - - - - - BUFFER SHAPES - - - - -
     //* Load 3D Model
@@ -214,7 +192,7 @@ int main(void) {
 
     //* - - - - - END OF CAMERA SETUP - - - - -
 
-    ModelObject model = ModelObject(&shaderProgram, &projectionMatrix, camera.getViewMatrix(), &texture);
+    ModelObject model = ModelObject(shader.getShaderProgram(), &projectionMatrix, camera.getViewMatrix(), &texture);
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window)) {
@@ -224,7 +202,7 @@ int main(void) {
         model.updateModel(camera.getViewMatrix());
        
         //* Use the shader
-        glUseProgram(shaderProgram);
+        glUseProgram(*shader.getShaderProgram());
         //* Load in the Vertex Array we made
         glBindVertexArray(VAO);
 
