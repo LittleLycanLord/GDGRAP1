@@ -20,7 +20,7 @@
 #include "tiny_obj_loader.h"
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include "Model/Entity/Texture/Texture.hpp"
 
 using namespace std;
 using namespace models;
@@ -34,6 +34,7 @@ float FIELD_OF_VIEW       = 60.f;
 
 Camera camera = Camera();
 Shaders shader = Shaders();
+Texture texture = Texture();
 
 void Key_Callback(GLFWwindow* window, int key, int scancode, int action,
                   int mods) {
@@ -58,51 +59,18 @@ int main(void) {
     //* Make the window's context current
     glfwMakeContextCurrent(window);
     gladLoadGL();
-    glEnable(GL_DEPTH_TEST);
-    //* - - - - - END OF GLFW SETUP - - - - -
-
-    //* - - - - - TEXTURE INITIALIZATION - - - - -
-    int imageWidth;
-    int imageHeight;
-    int colorChannels;
-
-    //* Flip Texture
-    stbi_set_flip_vertically_on_load(true);
-
-    //* Load Texture
-    unsigned char* tex_bytes = stbi_load("Model/Ayaya.png", &imageWidth,
-                                         &imageHeight, &colorChannels, 0);
-    GLuint texture;
-    //? 1 is the # of textures
-    //* Create an OpenGL reference for the texture
-    glGenTextures(1, &texture);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    //* Assign a texture to that reference
-    switch (colorChannels) {
-        case 3:
-            glTexImage2D(GL_TEXTURE_2D, 0,  //? <- Texture Index
-                         GL_RGB, imageWidth, imageHeight, 0, GL_RGB,
-                         GL_UNSIGNED_BYTE, tex_bytes);
-            break;
-        case 4:
-            glTexImage2D(GL_TEXTURE_2D, 0,  //? <- Texture Index
-                         GL_RGBA, imageWidth, imageHeight, 0, GL_RGBA,
-                         GL_UNSIGNED_BYTE, tex_bytes);
-            break;
-    }
-    //* Generate mipmaps
-    glGenerateMipmap(GL_TEXTURE_2D);
-    stbi_image_free(tex_bytes);
-    //* - - - - - END OF TEXTURE INITIALIZATION - - - - -
-
-    //* - - - - - BASIC INPUT - - - - -
     glfwSetKeyCallback(window, Key_Callback);
-    //* - - - - - END OF BASIC INPUT - - - - -
+    glEnable(GL_DEPTH_TEST);
 
+    //* - - - - - END OF GLFW SETUP - - - - -
+    
+    //* Load Texture
+    texture.initializeTexture();
     shader.initializeShaders();
-    shader.assignTexture(imageWidth, imageHeight, tex_bytes);
-
+    shader.assignTexture(texture.getImgWidth(), texture.getImgHeight(), texture.getTexBytes()); 
+    texture.freeImgData(); 
+    //* - - - - - END OF TEXTURE INITIALIZATION - - - - -
+ 
     //* - - - - - BUFFER SHAPES - - - - -
     //* Load 3D Model
     string path = "Model/Ayaya.obj";
@@ -171,7 +139,7 @@ int main(void) {
 
     //* - - - - - END OF BUFFER SHAPES - - - - -
 
-    ModelObject model = ModelObject(shader.getShaderProgram(), camera.getViewMatrix(), &texture);
+    ModelObject model = ModelObject(shader.getShaderProgram(), camera.getViewMatrix(), shader.getTexture());
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window)) {

@@ -139,7 +139,6 @@
     <ClCompile Include="Model\Component\Matrix.cpp" />
     <ClCompile Include="Model\Entity\BaseObject\BaseObject.cpp" />
     <ClCompile Include="Model\Entity\Camera\Camera.cpp" />
-    <ClCompile Include="Model\Entity\Model3D\Model3D.cpp" />
     <ClCompile Include="Model\Entity\ModelObject\ModelObject.cpp" />
     <ClCompile Include="Model\Entity\Texture\Texture.cpp" />
     <ClCompile Include="Shaders\Shaders.cpp" />
@@ -430,7 +429,6 @@
     <ClInclude Include="Model\Component\Matrix.hpp" />
     <ClInclude Include="Model\Entity\BaseObject\BaseObject.hpp" />
     <ClInclude Include="Model\Entity\Camera\Camera.hpp" />
-    <ClInclude Include="Model\Entity\Model3D\Model3D.hpp" />
     <ClInclude Include="Model\Entity\ModelObject\ModelObject.hpp" />
     <ClInclude Include="Model\Entity\Texture\Texture.hpp" />
     <ClInclude Include="Shaders\Shaders.hpp" />
