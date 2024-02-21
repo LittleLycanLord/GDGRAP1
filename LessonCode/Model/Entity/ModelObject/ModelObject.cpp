@@ -10,7 +10,10 @@ ModelObject::ModelObject(GLuint* shaderProg, glm::mat4* projection_matrix, glm::
     this->texture = *texture;
 }
 
-void ModelObject::updateModel() {
+void ModelObject::updateModel(glm::mat4* view_matrix) {
+
+    this->view_matrix = *view_matrix;
+
     unsigned int projectionLoc = glGetUniformLocation(this->shaderProg, "projection");
     glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(this->projection_matrix));
 

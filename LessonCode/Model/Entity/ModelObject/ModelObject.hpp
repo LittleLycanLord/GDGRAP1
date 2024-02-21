@@ -22,7 +22,7 @@ namespace models {
 		public:
 			ModelObject(GLuint* shaderProg, glm::mat4* projection_matrix, glm::mat4* view_matrix, GLuint* texture);
 		public:
-			void updateModel();
+			void updateModel(glm::mat4* view_matrix);
 			void drawModel(std::vector<GLuint>* mesh_indices);
 		public:
 			Matrix* getMatrix();

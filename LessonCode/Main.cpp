@@ -368,10 +368,9 @@ int main(void) {
         viewMatrix = glm::lookAt(cameraPos, Center, WorldUp);
         //* - - - - - END OF CAMERA - - - - -
 
-        
-
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
- 
+        
+        model.updateModel(&viewMatrix);
        
         //* Use the shader
         glUseProgram(shaderProgram);
