@@ -1,6 +1,6 @@
 // TODO: glad.h has to be included before glfw3.h
-#include "GLFW/glfw3.h"
 #include "glad/glad.h"
+#include "GLFW/glfw3.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -11,14 +11,6 @@
 #include "tiny_obj_loader.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
-
-#define X 0
-#define Y 1
-#define Z 2
-
-#define POSITION_DATA_INDEX 0
-#define NORMAL_DATA_INDEX 1
-#define UV_DATA_INDEX 2
 
 using namespace std;
 
@@ -34,7 +26,7 @@ float scalingRate         = 0.05f;
 float zoomRate            = 10.f;
 
 //* Translation Vector
-glm::vec3 translate       = glm::vec3(0.0f, 0.0f, -10.0f);
+glm::vec3 translate       = glm::vec3(0.0f, 0.0f, 0.0f);
 //* Scale Vector
 glm::vec3 scale           = glm::vec3(1.0f, 1.0f, 1.0f);
 //* Rotation Axes
@@ -43,6 +35,9 @@ glm::vec3 yRotationAxis   = glm::vec3(0.0f, 1.0f, 0.0f);
 glm::vec3 zRotationAxis   = glm::vec3(0.0f, 0.0f, 1.0f);
 //* Rotation Thetas
 glm::vec3 theta           = glm::vec3(0.0f, 0.0f, 0.0f);
+//* Camera Position
+glm::vec3 cameraPosition  = glm::vec3(0.0, 0, 10.f);
+glm::vec3 centerPosition  = glm::vec3(0.0, 3.f, 0.f);
 
 void Key_Callback(GLFWwindow* window, int key, int scancode, int action,
                   int mods) {
@@ -50,23 +45,35 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action,
         //* Moving:
         case GLFW_KEY_W:
             // if (action == GLFW_PRESS) {
-            translate.y += movementSpeed;
+            // translate.y += movementSpeed;
+            cameraPosition.z -= movementSpeed;
+            centerPosition.z -= movementSpeed;
             // }
             break;
         case GLFW_KEY_A:
-            translate.x -= movementSpeed;
+            // translate.x -= movementSpeed;
+            cameraPosition.x -= movementSpeed;
+            centerPosition.x -= movementSpeed;
             break;
         case GLFW_KEY_S:
-            translate.y -= movementSpeed;
+            // translate.y -= movementSpeed;
+            cameraPosition.z += movementSpeed;
+            centerPosition.z += movementSpeed;
             break;
         case GLFW_KEY_D:
-            translate.x += movementSpeed;
+            // translate.x += movementSpeed;
+            cameraPosition.x += movementSpeed;
+            centerPosition.x += movementSpeed;
             break;
         case GLFW_KEY_LEFT_SHIFT:
-            translate.z -= movementSpeed;
+            // translate.z -= movementSpeed;
+            cameraPosition.y += movementSpeed;
+            centerPosition.y += movementSpeed;
             break;
         case GLFW_KEY_LEFT_CONTROL:
-            translate.z += movementSpeed;
+            // translate.z += movementSpeed;
+            cameraPosition.y -= movementSpeed;
+            centerPosition.y -= movementSpeed;
             break;
         //* Rotating:
         case GLFW_KEY_UP:
@@ -142,7 +149,7 @@ int main(void) {
     if (!glfwInit()) return -1;
 
     //* Create a windowed mode window and its OpenGL context
-    window = glfwCreateWindow(int(WINDOW_WIDTH), int(WINDOW_HEIGHT), "U w U",
+    window = glfwCreateWindow(int(WINDOW_WIDTH), int(WINDOW_HEIGHT), "Repository",
                               NULL, NULL);
     if (!window) {
         glfwTerminate();
@@ -164,7 +171,7 @@ int main(void) {
     stbi_set_flip_vertically_on_load(true);
 
     //* Load Texture
-    unsigned char* tex_bytes = stbi_load("Model/partenza.jpg", &imageWidth,
+    unsigned char* tex_bytes = stbi_load("Model/Ayaya.png", &imageWidth,
                                          &imageHeight, &colorChannels, 0);
     GLuint texture;
     //? 1 is the # of textures
@@ -226,137 +233,74 @@ int main(void) {
 
     //* - - - - - BUFFER SHAPES - - - - -
     //* Load 3D Model
-    string path = "Model/djSword.obj";
+    string path = "Model/AyayaCube.obj";
     vector<tinyobj::shape_t> shapes;
     vector<tinyobj::material_t> material;
     string warning, error;
     tinyobj::attrib_t attributes;
     vector<GLuint> mesh_indices;
 
-    vector<GLfloat> fullVertexData;
-
     //* - - - - - UV DATA - - - - -
-    // GLfloat UV[]{0.f, 1.f, 0.f, 0.f, 1.f, 1.f, 1.f, 0.f,
-    //              1.f, 1.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f};
+    GLfloat UV[]{0.f, 1.f, 0.f, 0.f, 1.f, 1.f, 1.f, 0.f,
+                 1.f, 1.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f};
     //* - - - - - END OF UV DATA - - - - -
 
     if (tinyobj::LoadObj(&attributes, &shapes, &material, &warning, &error,
                          path.c_str())) {
-        // for (int i = 0; i < shapes[0].mesh.indices.size(); i++) {
-        //     mesh_indices.push_back(shapes[0].mesh.indices[i].vertex_index);
-        // }
-        for (tinyobj::index_t vData : shapes[0].mesh.indices) {
-            //*Insert Vertex Position Data: (X, Y, Z)
-            fullVertexData.push_back(
-                attributes.vertices[(vData.vertex_index * 3)]);
-            fullVertexData.push_back(
-                attributes.vertices[(vData.vertex_index * 3) + 1]);
-            fullVertexData.push_back(
-                attributes.vertices[(vData.vertex_index * 3) + 2]);
-            //*Insert Normals Position Data: (X, Y, Z)
-            fullVertexData.push_back(
-                attributes.normals[(vData.normal_index * 3)]);
-            fullVertexData.push_back(
-                attributes.normals[(vData.normal_index * 3) + 1]);
-            fullVertexData.push_back(
-                attributes.normals[(vData.normal_index * 3) + 2]);
-            //* Insert UV Data: (U, V)
-            fullVertexData.push_back(
-                attributes.texcoords[(vData.texcoord_index * 2)]);
-            fullVertexData.push_back(
-                attributes.texcoords[(vData.texcoord_index * 2) + 1]);
+        for (int i = 0; i < shapes[0].mesh.indices.size(); i++) {
+            mesh_indices.push_back(shapes[0].mesh.indices[i].vertex_index);
         }
-
-        // for (int i = 0; i < shapes[0].mesh.indices.size(); i++) {
-        //     tinyobj::index_t vData = shapes[0].mesh.indices[i];
-        //     //*Insert Vertex Position: (X, Y, Z)
-        //     fullVertexData.push_back(
-        //         attributes.vertices[(vData.vertex_index * 3)]);
-        //     fullVertexData.push_back(
-        //         attributes.vertices[(vData.vertex_index * 3) + 1]);
-        //     fullVertexData.push_back(
-        //         attributes.vertices[(vData.vertex_index * 3) + 2]);
-        //     //* Insert UV Data: (U, V)
-        //     fullVertexData.push_back(
-        //         attributes.texcoords[(vData.texcoord_index * 2)]);
-        //     fullVertexData.push_back(
-        //         attributes.texcoords[(vData.texcoord_index * 2) + 1]);
-        // }
     } else {
         cout << "Model Failed to Load." << endl;
     }
 
     //* Initialize Needed Parts
-    GLuint VAO;  //? Vertex Array
-    GLuint VBO;  //? Vertex Buffer
-    // GLuint VBO_UV;  //? Vertex Buffer for Texture
-    // GLuint EBO;     //? Element Buffer
+    GLuint VAO;     //? Vertex Array
+    GLuint VBO;     //? Vertex Buffer
+    GLuint VBO_UV;  //? Vertex Buffer for Texture
+    GLuint EBO;     //? Element Buffer
 
     //* Generate Vertex Array and Buffers
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
-    // glGenBuffers(1, &VBO_UV);
-    // glGenBuffers(1, &EBO);
+    glGenBuffers(1, &VBO_UV);
+    glGenBuffers(1, &EBO);
 
     //? Convetional Vertex Attribute Indices:
     //? 0: Vertices
-    //? 1: Normals
+    //? 1: ???
     //? 2: UV
 
     //* Open Vertex Array for Editing
     glBindVertexArray(VAO);
     //* Load in the Vertices
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-    //* Load in our Full Vertex Array
-    glBufferData(GL_ARRAY_BUFFER, sizeof(GL_FLOAT) * fullVertexData.size(),
-                 fullVertexData.data(), GL_DYNAMIC_DRAW);
-    //* Define our Full Vertex Array's layout
-    glVertexAttribPointer(POSITION_DATA_INDEX, 3, GL_FLOAT, GL_FALSE,
-                          8 * sizeof(float), (void*)0);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GL_FLOAT) * attributes.vertices.size(),
+                 attributes.vertices.data(), GL_STATIC_DRAW);
+    //* Define that we are using 3 dimensions
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
+                          (void*)0);
+    //* Load in the Edges
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * mesh_indices.size(),
+                 mesh_indices.data(), GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
 
-    GLintptr normPtr = 3 * sizeof(float);
-    glVertexAttribPointer(NORMAL_DATA_INDEX, 3, GL_FLOAT, GL_FALSE,
-                          8 * sizeof(float), (void*)normPtr);
-    glEnableVertexAttribArray(1);
-
-    GLintptr uvPtr = 6 * sizeof(float);
-    glVertexAttribPointer(UV_DATA_INDEX, 2, GL_FLOAT, GL_FALSE,
-                          8 * sizeof(float), (void*)uvPtr);
-    glEnableVertexAttribArray(2);
-
-    //* - - - - - BASIC VERTEX BUFFERING - - - - -
-    // glBufferData(GL_ARRAY_BUFFER, sizeof(GL_FLOAT) *
-    // attributes.vertices.size(),
-    //              attributes.vertices.data(), GL_STATIC_DRAW);
-    //* Define that we are using 3 dimensions
-    // glVertexAttribPointer(POSITION_DATA_INDEX, 3, GL_FLOAT, GL_FALSE, 3 *
-    // sizeof(float),
-    //                       (void*)0);
-    //* - - - - - END OF BASIC VERTEX BUFFERING - - - - -
-
-    //* Load in the Edges
-    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) *
-    // mesh_indices.size(),
-    //              mesh_indices.data(), GL_STATIC_DRAW);
-
     //* Bind UV Buffer
-    // glBindBuffer(GL_ARRAY_BUFFER, VBO_UV);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO_UV);
     //* Load UV Data
-    // glBufferData(GL_ARRAY_BUFFER,
-    //              sizeof(GLfloat) * (sizeof(UV) / sizeof(UV[0])), &UV[0],
-    //              GL_DYNAMIC_DRAW);
-    //* Define that we are using 2 dimensions
-    // glVertexAttribPointer(UV_DATA_INDEX, 2, GL_FLOAT, GL_FALSE, 2 *
-    // sizeof(float),
-    //                       (void*)0);
+    glBufferData(GL_ARRAY_BUFFER,
+                 sizeof(GLfloat) * (sizeof(UV) / sizeof(UV[0])), &UV[0],
+                 GL_DYNAMIC_DRAW);
+    //*
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float),
+                          (void*)0);
+    glEnableVertexAttribArray(2);
 
     //* Close Vertex Array and Buffers for Editing
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     //* - - - - - END OF BUFFER SHAPES - - - - -
 
@@ -389,15 +333,15 @@ int main(void) {
 
     //* Set Camera Orientation
     glm::mat4 cameraOrientation = glm::mat4(1.f);
-    cameraOrientation[X][X]     = rightVector.x;
-    cameraOrientation[Y][X]     = rightVector.y;
-    cameraOrientation[Z][X]     = rightVector.z;
-    cameraOrientation[X][Y]     = upVector.x;
-    cameraOrientation[Y][Y]     = upVector.y;
-    cameraOrientation[Z][Y]     = upVector.z;
-    cameraOrientation[X][Z]     = -forwardVector.x;
-    cameraOrientation[Y][Z]     = -forwardVector.y;
-    cameraOrientation[Z][Z]     = -forwardVector.z;
+    cameraOrientation[0][0]     = rightVector.x;
+    cameraOrientation[1][0]     = rightVector.y;
+    cameraOrientation[2][0]     = rightVector.z;
+    cameraOrientation[0][1]     = upVector.x;
+    cameraOrientation[1][1]     = upVector.y;
+    cameraOrientation[2][1]     = upVector.z;
+    cameraOrientation[0][2]     = -forwardVector.x;
+    cameraOrientation[1][2]     = -forwardVector.y;
+    cameraOrientation[2][2]     = -forwardVector.z;
 
     //* Set View Matrix
     glm::mat4 viewMatrix =
@@ -406,21 +350,11 @@ int main(void) {
 
     //* - - - - - END OF CAMERA SETUP - - - - -
 
-    //* - - - - - LIGHTING - - - - -
-    glm::vec3 lightPos     = glm::vec3(-10, 3, 0);
-    glm::vec3 lightColor   = glm::vec3(1, 1, 1);
-    float ambientStrength  = 0.5f;
-    glm::vec3 ambientColor = lightColor;
-    float specStrength     = 0.5f;
-    float specPhong        = 16;  //? Usually 16 - 25
-    //* - - - - - END OF LIGHTING - - - - -
-
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window)) {
         //* - - - - - CAMERA - - - - -
-        float x_mod = 0.f;
-        cameraPos   = glm::vec3(x_mod, 0, 10.f);
-        ;
+        cameraPos  = cameraPosition;
+        Center     = centerPosition;
         viewMatrix = glm::lookAt(cameraPos, Center, WorldUp);
         //* - - - - - END OF CAMERA - - - - -
 
@@ -472,41 +406,11 @@ int main(void) {
         GLuint tex0Address = glGetUniformLocation(shaderProgram, "tex0");
         glBindTexture(GL_TEXTURE_2D, texture);
         glUniform1i(tex0Address, 0);
-
-        //* Use lighting
-        GLuint lightAddress = glGetUniformLocation(shaderProgram, "lightPos");
-        glUniform3fv(lightAddress, 1, glm::value_ptr(lightPos));
-
-        GLuint lightColorAddress =
-            glGetUniformLocation(shaderProgram, "lightColor");
-        glUniform3fv(lightColorAddress, 1, glm::value_ptr(lightColor));
-
-        GLuint ambientAddress =
-            glGetUniformLocation(shaderProgram, "ambientStr");
-        glUniform1f(ambientAddress, ambientStrength);
-
-        GLuint ambientColorAddress =
-            glGetUniformLocation(shaderProgram, "ambientColor");
-        glUniform3fv(ambientColorAddress, 1, glm::value_ptr(ambientColor));
-
-        GLuint cameraPosAddress =
-            glGetUniformLocation(shaderProgram, "cameraPos");
-        glUniform3fv(cameraPosAddress, 1, glm::value_ptr(cameraPos));
-
-        GLuint specStrAddress = glGetUniformLocation(shaderProgram, "specStr");
-        glUniform1f(specStrAddress, specStrength);
-
-        GLuint specPhongAddress =
-            glGetUniformLocation(shaderProgram, "specPhong");
-        glUniform1f(specPhongAddress, specPhong);
-
-        // glDrawElements(
-        //     GL_TRIANGLES, GLsizei(mesh_indices.size()), GL_UNSIGNED_INT,
-        //     0);  // the GLsizei() is just to remove
-        //          // a warning, since glDrawElements has a parameter of it,
-        //          and
-        //          // it wants us to make sure we only plug GLsizei's in it.
-        glDrawArrays(GL_TRIANGLES, 0, fullVertexData.size() / 8);
+        glDrawElements(
+            GL_TRIANGLES, GLsizei(mesh_indices.size()), GL_UNSIGNED_INT,
+            0);  // the GLsizei() is just to remove
+                 // a warning, since glDrawElements has a parameter of it, and
+                 // it wants us to make sure we only plug GLsizei's in it.
 
         //* Swap front and back buffers
         glfwSwapBuffers(window);
@@ -517,8 +421,8 @@ int main(void) {
     //* Free up the memory we've used.
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
-    // glDeleteBuffers(1, &VBO_UV);
-    // glDeleteBuffers(1, &EBO);
+    glDeleteBuffers(1, &VBO_UV);
+    glDeleteBuffers(1, &EBO);
 
     glfwTerminate();
     return 0;
