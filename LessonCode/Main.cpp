@@ -36,6 +36,10 @@ Camera camera = Camera();
 Shaders shader = Shaders();
 Texture texture = Texture();
 BaseObject tinyObject = BaseObject();
+ModelObject model = ModelObject();
+
+vector<ModelObject> modelTracker;
+
 
 void Key_Callback(GLFWwindow* window, int key, int scancode, int action,
                   int mods) {
@@ -101,23 +105,18 @@ int main(void) {
     glBindVertexArray(VAO);
     //* Load in the Vertices
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(GL_FLOAT) * (*tinyObject.getObjAttributes()).vertices.size(),
-        (*tinyObject.getObjAttributes()).vertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GL_FLOAT) * (*tinyObject.getObjAttributes()).vertices.size(), (*tinyObject.getObjAttributes()).vertices.data(), GL_STATIC_DRAW);
     //* Define that we are using 3 dimensions
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
-                          (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     //* Load in the Edges
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * mesh_indices.size(),
-                 mesh_indices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * mesh_indices.size(), mesh_indices.data(), GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
 
     //* Bind UV Buffer
     glBindBuffer(GL_ARRAY_BUFFER, VBO_UV);
     //* Load UV Data
-    glBufferData(GL_ARRAY_BUFFER,
-                 sizeof(GLfloat) * (sizeof(UV) / sizeof(UV[0])), &UV[0],
-                 GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * (sizeof(UV) / sizeof(UV[0])), &UV[0], GL_DYNAMIC_DRAW);
     //*
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float),
                           (void*)0);
@@ -130,7 +129,7 @@ int main(void) {
 
     //* - - - - - END OF BUFFER SHAPES - - - - -
 
-    ModelObject model = ModelObject(shader.getShaderProgram(), camera.getViewMatrix(), shader.getTexture());
+    model.initialize(shader.getShaderProgram(), camera.getViewMatrix(), shader.getTexture());
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window)) {
