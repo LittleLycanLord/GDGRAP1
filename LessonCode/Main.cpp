@@ -31,7 +31,7 @@ const float WINDOW_WIDTH  = 600.f;
 const float WINDOW_HEIGHT = 600.f;
 float FIELD_OF_VIEW       = 60.f;
 
-
+glm::vec3 WorldUp         = glm::vec3(0, 1.0f, 0);
 Camera camera = Camera();
 Shaders shader = Shaders();
 Texture texture = Texture();
@@ -39,7 +39,7 @@ BaseObject tinyObject = BaseObject();
 
 void Key_Callback(GLFWwindow* window, int key, int scancode, int action,
                   int mods) {
-    camera.updateCamera(key, &FIELD_OF_VIEW);
+    camera.updateCamera(key, &FIELD_OF_VIEW, WorldUp);
 }
 
 int main(void) {
@@ -136,7 +136,8 @@ int main(void) {
     while (!glfwWindowShouldClose(window)) {
         
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
+
+        camera.updateCamera(0, &FIELD_OF_VIEW, WorldUp);
         model.updateModel(camera.getViewMatrix());
        
         //* Use the shader

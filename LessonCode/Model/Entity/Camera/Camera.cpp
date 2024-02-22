@@ -6,61 +6,61 @@ Camera::Camera() { this->initializeCamera(); }
 
 void Camera::initializeCamera() {
     //* Translation Vector
-    this->translate      = glm::vec3(0.0f, 0.0f, 0.0f);
+    this->translate              = glm::vec3(0.0f, 0.0f, 0.0f);
     //* Scale Vector
-    this->scale          = glm::vec3(1.0f, 1.0f, 1.0f);
+    this->scale                  = glm::vec3(1.0f, 1.0f, 1.0f);
     //* Rotation Axes
-    this->xRotationAxis  = glm::vec3(1.0f, 0.0f, 0.0f);
-    this->yRotationAxis  = glm::vec3(0.0f, 1.0f, 0.0f);
-    this->zRotationAxis  = glm::vec3(0.0f, 0.0f, 1.0f);
+    this->xRotationAxis          = glm::vec3(1.0f, 0.0f, 0.0f);
+    this->yRotationAxis          = glm::vec3(0.0f, 1.0f, 0.0f);
+    this->zRotationAxis          = glm::vec3(0.0f, 0.0f, 1.0f);
     //* Rotation Thetas
-    this->theta          = glm::vec3(0.0f, 0.0f, 0.0f);
+    this->theta                  = glm::vec3(0.0f, 0.0f, 0.0f);
     //* Camera Position
-    this->cameraPosition = glm::vec3(0.0, 0, 10.f);
-    this->centerPosition = glm::vec3(0.0, 3.f, 0.f);
-
-    this->WorldUp        = glm::vec3(0, 1.0f, 0);
-
-    this->viewMatrix =
-        glm::lookAt(this->cameraPosition, this->centerPosition, this->WorldUp);
+    this->cameraPosition         = glm::vec3(0.0, 0, 10.f);
+    this->pseudoMousePosition    = glm::vec2(0.0f, 0.0f);
+    this->pseudoOldMousePosition = glm::vec2(0.0f, 0.0f);
+    this->centerPosition         = glm::vec3(0.0, 0.f, -1.f);
 }
-void Camera::updateCamera(int key, float* FOV) {
-    //* Rates of Change
-    float movementSpeed = 0.1f;
-    float rotateSpeed   = 10.f;
-    float scalingRate   = 0.05f;
-    float zoomRate      = 10.f;
 
+void Camera::updateCamera(int key, float* FOV, glm::vec3 WorldUp) {
+    //* Rates of Change
+    float movementSpeed       = 0.1f;
+    float rotateSpeed         = 0.1f;
+    float scalingRate         = 0.05f;
+    float zoomRate            = 10.f;
+    glm::vec3 strafeDirection = glm::cross(centerPosition, WorldUp);
     switch (key) {
         //* Moving:
         case GLFW_KEY_W:
-            cameraPosition.z -= movementSpeed;
-            centerPosition.z -= movementSpeed;
+            cameraPosition += movementSpeed * centerPosition;
             break;
         case GLFW_KEY_A:
-            cameraPosition.x -= movementSpeed;
-            centerPosition.x -= movementSpeed;
+            cameraPosition -= movementSpeed * strafeDirection;
             break;
         case GLFW_KEY_S:
-            cameraPosition.z += movementSpeed;
-            centerPosition.z += movementSpeed;
+            cameraPosition -= movementSpeed * centerPosition;
             break;
         case GLFW_KEY_D:
-            cameraPosition.x += movementSpeed;
-            centerPosition.x += movementSpeed;
+            cameraPosition += movementSpeed * strafeDirection;
+            break;
+        case GLFW_KEY_LEFT_SHIFT:
+            cameraPosition += movementSpeed * WorldUp;
+            break;
+        case GLFW_KEY_LEFT_CONTROL:
+            cameraPosition -= movementSpeed * WorldUp;
             break;
             //* Rotating:
         case GLFW_KEY_UP:
-            theta.x -= rotateSpeed;
+            this->pseudoMousePosition.y += rotateSpeed;
             break;
         case GLFW_KEY_DOWN:
-            theta.x += rotateSpeed;
+            this->pseudoMousePosition.y -= rotateSpeed;
             break;
         case GLFW_KEY_LEFT:
-            theta.y -= rotateSpeed;
+            this->pseudoMousePosition.x -= rotateSpeed;
             break;
         case GLFW_KEY_RIGHT:
-            theta.y += rotateSpeed;
+            this->pseudoMousePosition.x += rotateSpeed;
             break;
             //* Zooming:
         case GLFW_KEY_Z:
@@ -70,9 +70,20 @@ void Camera::updateCamera(int key, float* FOV) {
             *FOV += zoomRate;
             break;
     }
+    glm::vec2 mouseDelta =
+        this->pseudoMousePosition - this->pseudoOldMousePosition;
+
+    this->centerPosition =
+        glm::mat3(glm::rotate(-mouseDelta.x, WorldUp)) * this->centerPosition;
+    this->centerPosition =
+        glm::mat3(glm::rotate(mouseDelta.y,
+                              glm::cross(this->centerPosition, WorldUp))) *
+        this->centerPosition;
+    this->pseudoOldMousePosition = this->pseudoMousePosition;
 
     this->viewMatrix =
-        glm::lookAt(this->cameraPosition, this->centerPosition, this->WorldUp);
+        glm::lookAt(this->cameraPosition,
+                    this->cameraPosition + this->centerPosition, WorldUp);
 }
 
 glm::mat4* Camera::getViewMatrix() { return &this->viewMatrix; }
