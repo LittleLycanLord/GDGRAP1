@@ -14,6 +14,8 @@ namespace models {
 		public:
 			BaseObject();
 		public:
+			void initialize();
+		public:
 			std::string getObjFilePath();
 			std::vector<tinyobj::shape_t>* getShapes();
 			std::vector<tinyobj::material_t>* getMaterial();

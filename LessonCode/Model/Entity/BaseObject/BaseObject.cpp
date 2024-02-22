@@ -2,13 +2,14 @@
 
 using namespace models;
 
-BaseObject::BaseObject() {
-    this->objFilePath = "3D/myCube.obj";
+BaseObject::BaseObject() {}
+
+void BaseObject::initialize() {
+    this->objFilePath = "Model/Ayaya.obj";
     bool success = tinyobj::LoadObj(&this->attributes, &this->shapes, &this->material, &this->warning, &this->error, this->objFilePath.c_str());
     if (!success) {
-        std::cout << "Object loaded sucessfully" << std::endl;
+        std::cout << "ERROR LOADING OBJECT!" << std::endl;
     }
- 
 }
 
 std::string BaseObject::getObjFilePath() {

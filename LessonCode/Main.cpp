@@ -17,7 +17,7 @@
 #include "Shaders/Shaders.hpp"
 
 #define TINYOBJLOADER_IMPLEMENTATION
-#include "tiny_obj_loader.h"
+#include "Model/Entity/BaseObject/BaseObject.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "Model/Entity/Texture/Texture.hpp"
@@ -35,6 +35,7 @@ float FIELD_OF_VIEW       = 60.f;
 Camera camera = Camera();
 Shaders shader = Shaders();
 Texture texture = Texture();
+BaseObject tinyObject = BaseObject();
 
 void Key_Callback(GLFWwindow* window, int key, int scancode, int action,
                   int mods) {
@@ -73,25 +74,15 @@ int main(void) {
  
     //* - - - - - BUFFER SHAPES - - - - -
     //* Load 3D Model
-    string path = "Model/Ayaya.obj";
-    vector<tinyobj::shape_t> shapes;
-    vector<tinyobj::material_t> material;
-    string warning, error;
-    tinyobj::attrib_t attributes;
+    tinyObject.initialize();
     vector<GLuint> mesh_indices;
 
     //* - - - - - UV DATA - - - - -
     GLfloat UV[]{0.f, 1.f, 0.f, 0.f, 1.f, 1.f, 1.f, 0.f,
                  1.f, 1.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f};
     //* - - - - - END OF UV DATA - - - - -
-
-    if (tinyobj::LoadObj(&attributes, &shapes, &material, &warning, &error,
-                         path.c_str())) {
-        for (int i = 0; i < shapes[0].mesh.indices.size(); i++) {
-            mesh_indices.push_back(shapes[0].mesh.indices[i].vertex_index);
-        }
-    } else {
-        cout << "Model Failed to Load." << endl;
+    for (int i = 0; i < (*tinyObject.getShapes())[0].mesh.indices.size(); i++) {
+       mesh_indices.push_back((*tinyObject.getShapes())[0].mesh.indices[i].vertex_index);
     }
 
     //* Initialize Needed Parts
@@ -110,8 +101,8 @@ int main(void) {
     glBindVertexArray(VAO);
     //* Load in the Vertices
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(GL_FLOAT) * attributes.vertices.size(),
-                 attributes.vertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GL_FLOAT) * (*tinyObject.getObjAttributes()).vertices.size(),
+        (*tinyObject.getObjAttributes()).vertices.data(), GL_STATIC_DRAW);
     //* Define that we are using 3 dimensions
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
                           (void*)0);
