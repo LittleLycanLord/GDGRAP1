@@ -2,7 +2,10 @@
 
 using namespace shaders;
 
-Shaders::Shaders() {}
+Shaders::Shaders() {
+    this->shaderProg = GLuint();
+    this->texture = GLuint();
+}
 
 void Shaders::initializeShaders() {
     std::fstream vertSrc("Shaders/sample.vert");
