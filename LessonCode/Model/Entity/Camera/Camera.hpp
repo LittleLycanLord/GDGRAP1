@@ -1,8 +1,11 @@
 #pragma once
-#include "../../Component/Transformable.hpp"
+
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
+
 #include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+
 #include "iostream"
 #include "string"
 #include "vector"
@@ -10,44 +13,31 @@
 using namespace std;
 
 namespace models {
-using namespace components;
-class Camera : public Transformable {
-    //* ╔════════════╗
-    //* ║ Attributes ║
-    //* ╚════════════╝
-    string cameraName;
-    glm::vec3 WorldUp;
-    glm::vec3 Center;
-    //* Camera Position
-    glm::vec3 cameraPos;
-    glm::mat4 cameraPositionMatrix;
+    class Camera {     
+        private:
+            glm::vec3 translate;
+            glm::vec3 scale;
+            glm::vec3 xRotationAxis;
+            glm::vec3 yRotationAxis;
+            glm::vec3 zRotationAxis;
+            glm::vec3 theta;
 
-    glm::vec3 forwardVector;
-    glm::vec3 rightVector;
-    glm::vec3 upVector;
+        private:
+            glm::vec3 cameraPosition;
+            glm::vec3 centerPosition;
+            glm::mat4 viewMatrix;
+            glm::vec3 WorldUp;
+                
 
-    glm::mat4 cameraOrientation = glm::mat4(1.f);
+        public:
+            Camera();
 
-    glm::mat4 viewMatrix;
+        public:
+            void initializeCamera();
+            void updateCamera(int key, float* FOV);
+        public:
+            glm::mat4* getViewMatrix();
+            
+    };
+}  
 
-public:
-    //* ╔═══════════════════════════════╗
-    //* ║ Constructors & Deconstructors ║
-    //* ╚═══════════════════════════════╝
-    Camera(string cameraName);
-
-public:
-    //* ╔═════════╗
-    //* ║ Methods ║
-    //* ╚═════════╝
-    void initializeCamera();
-    void updateCamera();
-
-    //* ╔═══════════════════╗
-    //* ║ Getters & Setters ║
-    //* ╚═══════════════════╝
-public:
-    glm::mat4 getViewMatrix();
-    void moveCamera(glm::vec3 cameraPos);
-};
-}  // namespace models
