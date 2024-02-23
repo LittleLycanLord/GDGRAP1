@@ -15,15 +15,24 @@ namespace models {
 	class ModelObject {
 		private:
 			Matrix modelMatrix;
-			GLuint shaderProg;
+
+		private:
 			glm::mat4 projection_matrix;
 			glm::mat4 view_matrix;
+
+		private:
+			GLuint shaderProg;
 			GLuint texture;
+		
+		private:
+			bool isInitialized;
+
 		public:
 			ModelObject();
 		public:
 			void initialize(GLuint* shaderProg, glm::mat4* view_matrix, GLuint* texture);
 			void updateModel(glm::mat4* view_matrix);
+			void setModelInFrontOfCam(glm::vec3* cameraPosition, glm::vec3* centerPosition);
 			void drawModel(std::vector<GLuint>* mesh_indices);
 		public:
 			Matrix* getMatrix();

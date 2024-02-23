@@ -24,7 +24,7 @@ void Camera::initializeCamera() {
 
 void Camera::updateCamera(int key, float* FOV, glm::vec3 WorldUp) {
     //* Rates of Change
-    float movementSpeed       = 0.1f;
+    float movementSpeed       = 0.3f;
     float rotateSpeed         = 0.1f;
     float scalingRate         = 0.05f;
     float zoomRate            = 10.f;
@@ -73,17 +73,14 @@ void Camera::updateCamera(int key, float* FOV, glm::vec3 WorldUp) {
     glm::vec2 mouseDelta =
         this->pseudoMousePosition - this->pseudoOldMousePosition;
 
-    this->centerPosition =
-        glm::mat3(glm::rotate(-mouseDelta.x, WorldUp)) * this->centerPosition;
-    this->centerPosition =
-        glm::mat3(glm::rotate(mouseDelta.y,
-                              glm::cross(this->centerPosition, WorldUp))) *
-        this->centerPosition;
-    this->pseudoOldMousePosition = this->pseudoMousePosition;
+    glm::vec3 vecData = this->cameraPosition + this->centerPosition;
 
-    this->viewMatrix =
-        glm::lookAt(this->cameraPosition,
-                    this->cameraPosition + this->centerPosition, WorldUp);
+    this->centerPosition = glm::mat3(glm::rotate(-mouseDelta.x, WorldUp)) * this->centerPosition;
+    this->centerPosition = glm::mat3(glm::rotate(mouseDelta.y,glm::cross(this->centerPosition, WorldUp))) * this->centerPosition;
+    this->pseudoOldMousePosition = this->pseudoMousePosition;
+    this->viewMatrix = glm::lookAt(this->cameraPosition, this->cameraPosition + this->centerPosition, WorldUp);
 }
 
 glm::mat4* Camera::getViewMatrix() { return &this->viewMatrix; }
+glm::vec3* Camera::getCameraPosition() { return &this->cameraPosition; }
+glm::vec3* Camera::getCenterPosition() { return &this->centerPosition;}

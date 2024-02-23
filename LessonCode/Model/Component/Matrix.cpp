@@ -11,9 +11,9 @@ void Matrix::initializeTransformMatrix() {
 	this->fTranslate_Y = 0.0f;
 	this->fTranslate_Z = -2.0f;
 
-	this->fScale_X = 3.0f;
-	this->fScale_Y = 3.0f;
-	this->fScale_Z = 1.0f;
+	this->fScale_X = 0.95f;
+	this->fScale_Y = 0.95f;
+	this->fScale_Z = 0.95f;
 
 	this->fTheta = 90.0f;
 	this->fAxis_X = 0.0f;
@@ -124,6 +124,10 @@ float Matrix::getRotateVar(char cVar) {
 
 float Matrix::getPerspectiveTheta() {
 	return this->fPerspectiveTheta;
+}
+
+void Matrix::setTransformMatrix(glm::mat4 value) {
+	this->transformation_matrix = value;
 }
 
 glm::mat4* Matrix::getTransformMatrix() {

@@ -31,19 +31,28 @@ const float WINDOW_WIDTH  = 600.f;
 const float WINDOW_HEIGHT = 600.f;
 float FIELD_OF_VIEW       = 60.f;
 
-glm::vec3 WorldUp         = glm::vec3(0, 1.0f, 0);
+glm::vec3 WorldUp  = glm::vec3(0, 1.0f, 0);
 Camera camera = Camera();
 Shaders shader = Shaders();
 Texture texture = Texture();
 BaseObject tinyObject = BaseObject();
-ModelObject model = ModelObject();
+ModelObject* model = new ModelObject();
 
 vector<ModelObject> modelTracker;
 
 
 void Key_Callback(GLFWwindow* window, int key, int scancode, int action,
                   int mods) {
+    //std::cout << "translate x value: " << model->getMatrix()->getTranslateVar('X') << std::endl;
     camera.updateCamera(key, &FIELD_OF_VIEW, WorldUp);
+    
+    switch (key) {
+        case GLFW_KEY_SPACE:
+            std::cout << "you pressed space!" << std::endl;
+            model->setModelInFrontOfCam(camera.getCameraPosition(), camera.getCenterPosition());
+            //std::cout << "translate x value: " << model->getMatrix()->getTranslateVar('X') << std::endl;
+            break;
+    }
 }
 
 int main(void) {
@@ -129,22 +138,24 @@ int main(void) {
 
     //* - - - - - END OF BUFFER SHAPES - - - - -
 
-    model.initialize(shader.getShaderProgram(), camera.getViewMatrix(), shader.getTexture());
+    model->initialize(shader.getShaderProgram(), camera.getViewMatrix(), shader.getTexture());
+
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window)) {
         
+        
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         camera.updateCamera(0, &FIELD_OF_VIEW, WorldUp);
-        model.updateModel(camera.getViewMatrix());
+        model->updateModel(camera.getViewMatrix());
        
         //* Use the shader
         glUseProgram(*shader.getShaderProgram());
         //* Load in the Vertex Array we made
         glBindVertexArray(VAO);
 
-        model.drawModel(&mesh_indices);
+        model->drawModel(&mesh_indices);
 
         glEnd();
 

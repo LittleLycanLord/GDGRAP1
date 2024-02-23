@@ -29,6 +29,7 @@ namespace matrix {
 		void initializeTransformMatrix();
 	public:
 		void calculateTransformMatrix();
+		
 	public:
 		void setTranslateVar(char cVar, float fValue);
 		float getTranslateVar(char cVar);
@@ -37,6 +38,7 @@ namespace matrix {
 		void setRotateVar(char cVar, float fValue);
 		float getRotateVar(char cVar);
 		float getPerspectiveTheta();
+		void setTransformMatrix(glm::mat4 value);
 		glm::mat4* getTransformMatrix();
 	};
 }
