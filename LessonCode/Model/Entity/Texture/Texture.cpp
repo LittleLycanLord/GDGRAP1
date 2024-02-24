@@ -11,7 +11,7 @@ Texture::Texture() {
 
 void Texture::initializeTexture() {
     stbi_set_flip_vertically_on_load(true);
-    this->tex_bytes = stbi_load("Model/partenza.jpg", &this->img_width, &this->img_height, &this->colorChannels, 0);
+    this->tex_bytes = stbi_load("Model/Knuckles.png", &this->img_width, &this->img_height, &this->colorChannels, 0);
 }
 
 void Texture::freeImgData() {

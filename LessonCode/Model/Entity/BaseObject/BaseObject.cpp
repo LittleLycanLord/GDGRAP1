@@ -5,7 +5,7 @@ using namespace models;
 BaseObject::BaseObject() {}
 
 void BaseObject::initialize() {
-    this->objFilePath = "Model/djSword.obj";
+    this->objFilePath = "Model/Knuckles.obj";
     bool success = tinyobj::LoadObj(&this->attributes, &this->shapes, &this->material, &this->warning, &this->error, this->objFilePath.c_str());
     if (!success) {
         std::cout << "ERROR LOADING OBJECT!" << std::endl;

@@ -73,7 +73,7 @@ void ModelObject::updateModel(glm::vec3 cameraPosition) {
 void ModelObject::setModelInFrontOfCam(glm::vec3* cameraPosition,
                                        glm::vec3* centerPosition,
                                        glm::vec3* cameraTheta) {
-    float offset    = 50.f;
+    float offset    = 5.f;
     glm::vec3 Front = (*cameraPosition) + offset * (*centerPosition);
 
     this->modelMatrix.setTranslateVar('X', Front.x);

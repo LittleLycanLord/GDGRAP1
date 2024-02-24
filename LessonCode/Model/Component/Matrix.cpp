@@ -9,9 +9,9 @@ void Matrix::initializeTransformMatrix() {
     this->fTranslate_Y          = 0.0f;
     this->fTranslate_Z          = -2.0f;
 
-    this->fScale_X              = 0.95f;
-    this->fScale_Y              = 0.95f;
-    this->fScale_Z              = 0.95f;
+    this->fScale_X              = 0.1f;
+    this->fScale_Y              = 0.1f;
+    this->fScale_Z              = 0.1f;
 
     this->vecTheta              = glm::vec3(0.f);
     this->vecRotationAxis_X     = glm::vec3(1.0f, 0.0f, 0.0f);
