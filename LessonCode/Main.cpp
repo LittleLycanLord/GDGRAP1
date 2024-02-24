@@ -40,6 +40,22 @@ ModelObject* model = new ModelObject();
 
 vector<ModelObject> modelTracker;
 
+float tickCount = 0.0f;
+
+void countTicks() {
+    if (tickCount == 3.75f) {
+        tickCount -= 0.0005f;
+    }
+    else if (tickCount < 3.75f && tickCount > 0) {
+        tickCount -= 0.0005f;
+        if (tickCount < 0.f) {
+            tickCount = 0.f;
+        }
+    }
+    else if (tickCount < 0.f) {
+        tickCount = 0.f;
+    }
+}
 
 void Key_Callback(GLFWwindow* window, int key, int scancode, int action,
                   int mods) {
@@ -49,9 +65,16 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action,
         if (action == GLFW_PRESS) {
             switch (key) {
                 case GLFW_KEY_SPACE:
-                    model->setModelInFrontOfCam(camera.getCameraPosition(), camera.getCenterPosition());
-                    modelTracker.push_back(*model);
-                    //std::cout << "translate x value: " << model->getMatrix()->getTranslateVar('X') << std::endl;
+                    if (tickCount == 0.0f) {
+                        model->setModelInFrontOfCam(camera.getCameraPosition(), camera.getCenterPosition());
+                        modelTracker.push_back(*model);
+                        tickCount = 3.75f;
+                       
+                    }
+                    else {
+                        std::cout << "[SYSTEM]: ON COOLDOWN!" << std::endl;
+                        
+                    }
                     break;
             }
         }
@@ -149,7 +172,9 @@ int main(void) {
         
         
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        std::cout << "size: " << modelTracker.size() << std::endl;
+        
+        countTicks();
+
         camera.updateCamera(0, &FIELD_OF_VIEW, WorldUp);
         model->setViewMatrix(*camera.getViewMatrix());
         model->updateModel();
