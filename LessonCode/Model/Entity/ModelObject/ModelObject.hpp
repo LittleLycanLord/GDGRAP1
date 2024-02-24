@@ -31,10 +31,11 @@ namespace models {
 			ModelObject();
 		public:
 			void initialize(GLuint* shaderProg, glm::mat4* view_matrix, GLuint* texture);
-			void updateModel(glm::mat4* view_matrix);
+			void updateModel();
 			void setModelInFrontOfCam(glm::vec3* cameraPosition, glm::vec3* centerPosition);
 			void drawModel(std::vector<GLuint>* mesh_indices);
 		public:
+			void setViewMatrix(glm::mat4 viewMatrix);
 			Matrix* getMatrix();
 	};
 }
