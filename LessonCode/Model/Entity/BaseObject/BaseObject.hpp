@@ -1,7 +1,9 @@
 #pragma once
-
 #include "../../tiny_obj_loader.h"
+#include "glad/glad.h"
+#include "GLFW/glfw3.h"
 #include "iostream"
+#include "vector"
 namespace models {
 	class BaseObject {
 		private:
@@ -11,7 +13,10 @@ namespace models {
 			std::string warning;
 			std::string error;
 			tinyobj::attrib_t attributes;
-		public:
+		
+            std::vector<GLfloat> fullVertexData;
+
+        public:
 			BaseObject();
 		public:
 			void initialize();
@@ -22,5 +27,6 @@ namespace models {
 			std::string* getWarningString();
 			std::string* getErrorString();
 			tinyobj::attrib_t* getObjAttributes();
-	};
+            std::vector<GLfloat>* getFullVertexData();
+    };
 }	

@@ -5,10 +5,30 @@ using namespace models;
 BaseObject::BaseObject() {}
 
 void BaseObject::initialize() {
-    this->objFilePath = "Model/Ayaya.obj";
+    this->objFilePath = "Model/djSword.obj";
     bool success = tinyobj::LoadObj(&this->attributes, &this->shapes, &this->material, &this->warning, &this->error, this->objFilePath.c_str());
     if (!success) {
         std::cout << "ERROR LOADING OBJECT!" << std::endl;
+        return;
+    }
+    for (tinyobj::index_t vData : this->shapes[0].mesh.indices) {
+        //*Insert Vertex Position Data: (X, Y, Z)
+        this->fullVertexData.push_back(attributes.vertices[(vData.vertex_index * 3)]);
+        this->fullVertexData.push_back(
+            attributes.vertices[(vData.vertex_index * 3) + 1]);
+        this->fullVertexData.push_back(
+            attributes.vertices[(vData.vertex_index * 3) + 2]);
+        //*Insert Normals Position Data: (X, Y, Z)
+        this->fullVertexData.push_back(attributes.normals[(vData.normal_index * 3)]);
+        this->fullVertexData.push_back(
+            attributes.normals[(vData.normal_index * 3) + 1]);
+        this->fullVertexData.push_back(
+            attributes.normals[(vData.normal_index * 3) + 2]);
+        //* Insert UV Data: (U, V)
+        this->fullVertexData.push_back(
+            attributes.texcoords[(vData.texcoord_index * 2)]);
+        this->fullVertexData.push_back(
+            attributes.texcoords[(vData.texcoord_index * 2) + 1]);
     }
 }
 
@@ -34,4 +54,8 @@ std::string* BaseObject::getErrorString() {
 
 tinyobj::attrib_t* BaseObject::getObjAttributes() {
     return &this->attributes;
+}
+
+std::vector<GLfloat>* BaseObject::getFullVertexData() {
+    return &this->fullVertexData;
 }

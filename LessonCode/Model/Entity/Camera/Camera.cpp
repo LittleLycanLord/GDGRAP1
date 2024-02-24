@@ -22,10 +22,9 @@ void Camera::initializeCamera() {
     this->centerPosition         = glm::vec3(0.0, 0.f, -1.f);
 }
 
-void Camera::updateCamera(int key, float* FOV, glm::vec3 WorldUp) {
+void Camera::updateCamera(int key, int action, float* FOV, glm::vec3 WorldUp) {
     //* Rates of Change
     float movementSpeed       = 0.3f;
-    float rotateSpeed         = 0.1f;
     float scalingRate         = 0.05f;
     float zoomRate            = 10.f;
     glm::vec3 strafeDirection = glm::cross(centerPosition, WorldUp);
@@ -51,16 +50,20 @@ void Camera::updateCamera(int key, float* FOV, glm::vec3 WorldUp) {
             break;
             //* Rotating:
         case GLFW_KEY_UP:
-            this->pseudoMousePosition.y += rotateSpeed;
+            this->pseudoMousePosition.y += this->rotateSpeed;
+            this->theta.x -= this->rotateSpeed * 57.2958f; //? PI -> Degrees
             break;
         case GLFW_KEY_DOWN:
-            this->pseudoMousePosition.y -= rotateSpeed;
+            this->pseudoMousePosition.y -= this->rotateSpeed;
+            this->theta.x += this->rotateSpeed * 57.2958f; //? PI -> Degrees
             break;
         case GLFW_KEY_LEFT:
-            this->pseudoMousePosition.x -= rotateSpeed;
+            this->pseudoMousePosition.x -= this->rotateSpeed;
+            this->theta.y -= this->rotateSpeed * 57.2958f; //? PI -> Degrees
             break;
         case GLFW_KEY_RIGHT:
-            this->pseudoMousePosition.x += rotateSpeed;
+            this->pseudoMousePosition.x += this->rotateSpeed;
+            this->theta.y += this->rotateSpeed * 57.2958f; //? PI -> Degrees
             break;
             //* Zooming:
         case GLFW_KEY_Z:
@@ -75,12 +78,19 @@ void Camera::updateCamera(int key, float* FOV, glm::vec3 WorldUp) {
 
     glm::vec3 vecData = this->cameraPosition + this->centerPosition;
 
-    this->centerPosition = glm::mat3(glm::rotate(-mouseDelta.x, WorldUp)) * this->centerPosition;
-    this->centerPosition = glm::mat3(glm::rotate(mouseDelta.y,glm::cross(this->centerPosition, WorldUp))) * this->centerPosition;
+    this->centerPosition =
+        glm::mat3(glm::rotate(-mouseDelta.x, WorldUp)) * this->centerPosition;
+    this->centerPosition =
+        glm::mat3(glm::rotate(mouseDelta.y,
+                              glm::cross(this->centerPosition, WorldUp))) *
+        this->centerPosition;
     this->pseudoOldMousePosition = this->pseudoMousePosition;
-    this->viewMatrix = glm::lookAt(this->cameraPosition, this->cameraPosition + this->centerPosition, WorldUp);
+    this->viewMatrix =
+        glm::lookAt(this->cameraPosition,
+                    this->cameraPosition + this->centerPosition, WorldUp);
 }
 
 glm::mat4* Camera::getViewMatrix() { return &this->viewMatrix; }
 glm::vec3* Camera::getCameraPosition() { return &this->cameraPosition; }
-glm::vec3* Camera::getCenterPosition() { return &this->centerPosition;}
+glm::vec3* Camera::getCenterPosition() { return &this->centerPosition; }
+glm::vec3* Camera::getTheta() { return &this->theta; }

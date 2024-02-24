@@ -41,11 +41,21 @@ void Shaders::initializeShaders() {
     glBindTexture(GL_TEXTURE_2D, this->texture);
 }
 
-void Shaders::assignTexture(int img_width, int img_height, unsigned char* tex_bytes) {
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img_width, img_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex_bytes);
+void Shaders::assignTexture(int colorChannels, int img_width, int img_height,
+                            unsigned char* tex_bytes) {
+    switch (colorChannels) {
+        case 3:
+            glTexImage2D(GL_TEXTURE_2D, 0,  //? <- Texture Index
+                         GL_RGB, img_width, img_height, 0, GL_RGB,
+                         GL_UNSIGNED_BYTE, tex_bytes);
+            break;
+        case 4:
+            glTexImage2D(GL_TEXTURE_2D, 0,  //? <- Texture Index
+                         GL_RGBA, img_width, img_height, 0, GL_RGBA,
+                         GL_UNSIGNED_BYTE, tex_bytes);
+            break;
+    }
     glGenerateMipmap(GL_TEXTURE_2D);
-
 }
 
 GLuint* Shaders::getShaderProgram() {

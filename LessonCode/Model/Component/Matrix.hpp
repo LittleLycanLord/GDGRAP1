@@ -15,10 +15,10 @@ namespace matrix {
 		float fScale_Y;
 		float fScale_Z;
 
-		float fTheta;
-		float fAxis_X;
-		float fAxis_Y;
-		float fAxis_Z;
+		glm::vec3 vecTheta;
+		glm::vec3 vecRotationAxis_X;
+		glm::vec3 vecRotationAxis_Y;
+		glm::vec3 vecRotationAxis_Z;
 
 		float fPerspectiveTheta;
 		glm::mat4 transformation_matrix;

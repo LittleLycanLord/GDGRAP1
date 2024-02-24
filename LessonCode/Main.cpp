@@ -40,16 +40,15 @@ ModelObject* model = new ModelObject();
 
 vector<ModelObject> modelTracker;
 
-
 void Key_Callback(GLFWwindow* window, int key, int scancode, int action,
                   int mods) {
     //std::cout << "translate x value: " << model->getMatrix()->getTranslateVar('X') << std::endl;
    
-        camera.updateCamera(key, &FIELD_OF_VIEW, WorldUp);
+        camera.updateCamera(key, action, &FIELD_OF_VIEW, WorldUp);
         if (action == GLFW_PRESS) {
             switch (key) {
                 case GLFW_KEY_SPACE:
-                    model->setModelInFrontOfCam(camera.getCameraPosition(), camera.getCenterPosition());
+                    model->setModelInFrontOfCam(camera.getCameraPosition(), camera.getCenterPosition(), camera.getTheta());
                     modelTracker.push_back(*model);
                     //std::cout << "translate x value: " << model->getMatrix()->getTranslateVar('X') << std::endl;
                     break;
@@ -84,7 +83,7 @@ int main(void) {
     //* Load Texture
     texture.initializeTexture();
     shader.initializeShaders();
-    shader.assignTexture(texture.getImgWidth(), texture.getImgHeight(), texture.getTexBytes()); 
+    shader.assignTexture(texture.getColorChannels(), texture.getImgWidth(), texture.getImgHeight(), texture.getTexBytes()); 
     texture.freeImgData(); 
     //* - - - - - END OF TEXTURE INITIALIZATION - - - - -
  
@@ -93,10 +92,6 @@ int main(void) {
     tinyObject.initialize();
     vector<GLuint> mesh_indices;
 
-    //* - - - - - UV DATA - - - - -
-    GLfloat UV[]{0.f, 1.f, 0.f, 0.f, 1.f, 1.f, 1.f, 0.f,
-                 1.f, 1.f, 1.f, 0.f, 0.f, 1.f, 0.f, 0.f};
-    //* - - - - - END OF UV DATA - - - - -
     for (int i = 0; i < (*tinyObject.getShapes())[0].mesh.indices.size(); i++) {
        mesh_indices.push_back((*tinyObject.getShapes())[0].mesh.indices[i].vertex_index);
     }
@@ -104,55 +99,50 @@ int main(void) {
     //* Initialize Needed Parts
     GLuint VAO;     //? Vertex Array
     GLuint VBO;     //? Vertex Buffer
-    GLuint VBO_UV;  //? Vertex Buffer for Texture
-    GLuint EBO;     //? Element Buffer
 
     //* Generate Vertex Array and Buffers
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
-    glGenBuffers(1, &VBO_UV);
-    glGenBuffers(1, &EBO);
 
     //* Open Vertex Array for Editing
     glBindVertexArray(VAO);
     //* Load in the Vertices
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(GL_FLOAT) * (*tinyObject.getObjAttributes()).vertices.size(), (*tinyObject.getObjAttributes()).vertices.data(), GL_STATIC_DRAW);
-    //* Define that we are using 3 dimensions
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    //* Load in the Edges
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * mesh_indices.size(), mesh_indices.data(), GL_STATIC_DRAW);
+    //* Load in our Full Vertex Array
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GL_FLOAT) * (*tinyObject.getFullVertexData()).size(),
+                 (*tinyObject.getFullVertexData()).data(), GL_DYNAMIC_DRAW);
+    //* Define our Full Vertex Array's layout
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
+                          8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    //* Bind UV Buffer
-    glBindBuffer(GL_ARRAY_BUFFER, VBO_UV);
-    //* Load UV Data
-    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * (sizeof(UV) / sizeof(UV[0])), &UV[0], GL_DYNAMIC_DRAW);
-    //*
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float),
-                          (void*)0);
+    GLintptr normPtr = 3 * sizeof(float);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,
+                          8 * sizeof(float), (void*)normPtr);
+    glEnableVertexAttribArray(1);
+
+    GLintptr uvPtr = 6 * sizeof(float);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE,
+                          8 * sizeof(float), (void*)uvPtr);
     glEnableVertexAttribArray(2);
 
     //* Close Vertex Array and Buffers for Editing
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     //* - - - - - END OF BUFFER SHAPES - - - - -
 
     model->initialize(shader.getShaderProgram(), camera.getViewMatrix(), shader.getTexture());
-
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window)) {
         
         
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        std::cout << "size: " << modelTracker.size() << std::endl;
-        camera.updateCamera(0, &FIELD_OF_VIEW, WorldUp);
+        // std::cout << "size: " << modelTracker.size() << std::endl;
+        camera.updateCamera(0, 0, &FIELD_OF_VIEW, WorldUp);
         model->setViewMatrix(*camera.getViewMatrix());
-        model->updateModel();
+        model->updateModel(*camera.getCameraPosition());
        
         unsigned int viewLoc = glGetUniformLocation(*shader.getShaderProgram(), "view");
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(*camera.getViewMatrix()));
@@ -164,7 +154,8 @@ int main(void) {
 
         if (modelTracker.size() != 0) {
             for (unsigned int i = 0; i < modelTracker.size(); i++) {
-                modelTracker[i].drawModel(&mesh_indices);
+                modelTracker[i].drawModel(&mesh_indices, tinyObject.getFullVertexData(),
+                                          *camera.getCameraPosition());
             }
         }
 
@@ -179,8 +170,6 @@ int main(void) {
     //* Free up the memory we've used.
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &VBO_UV);
-    glDeleteBuffers(1, &EBO);
 
     glfwTerminate();
     return 0;
