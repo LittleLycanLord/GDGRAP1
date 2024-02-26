@@ -84,7 +84,7 @@ int main(void) {
 
     //* Create a windowed mode window and its OpenGL context
     window = glfwCreateWindow(int(WINDOW_WIDTH), int(WINDOW_HEIGHT),
-                              "Repository", NULL, NULL);
+                              "PC01-Ong_Lance_Ubay_Conrad", NULL, NULL);
     if (!window) {
         glfwTerminate();
         return -1;
