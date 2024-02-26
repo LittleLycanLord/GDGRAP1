@@ -37,6 +37,7 @@ ModelObject* model        = new ModelObject();
 vector<ModelObject> modelTracker;
 
 float tickCount = 0.0f;
+bool initialSpawn = false;
 
 void countTicks() {
     if (tickCount == 3.75f) {
@@ -163,6 +164,15 @@ int main(void) {
         camera.updateCamera(0, 0, &FIELD_OF_VIEW, WorldUp);
         model->setViewMatrix(*camera.getViewMatrix());
         model->updateModel(*camera.getCameraPosition());
+
+        if (initialSpawn == false) {
+            model->setModelInFrontOfCam(camera.getCameraPosition(),
+                camera.getCenterPosition(),
+                camera.getTheta());
+            modelTracker.push_back(*model);
+            initialSpawn = true;
+        }
+
 
         unsigned int viewLoc =
             glGetUniformLocation(*shader.getShaderProgram(), "view");
